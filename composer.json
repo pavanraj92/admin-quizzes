@@ -1,0 +1,22 @@
+{
+  "name": "admin/quizzes",
+  "description": "Create and manage quizzes, questions, options, and attempts in the admin panel.",
+  "type": "library",
+  "version": "1.0.0",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "admin\\quizzes\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "admin\\quizzes\\QuizServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
+  
