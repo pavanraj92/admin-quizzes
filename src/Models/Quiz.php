@@ -13,7 +13,7 @@ class Quiz extends Model
     use HasFactory, Sortable;
 
     protected $fillable = [
-        'user_id',       
+        'user_id',
         'course_id',
         'title',
         'description',
@@ -29,14 +29,15 @@ class Quiz extends Model
         'created_at'
     ];
 
-    public function scopeFilter($query, $title)
+    public function scopeFilter($query, $keyword)
     {
-        if ($title) {
-            return $query->where('title', 'like', '%' . $title . '%');
+        if ($keyword) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', '%' . $keyword . '%');
+            });
         }
         return $query;
     }
-
     public function course()
     {
         return $this->belongsTo(Course::class);
@@ -63,4 +64,3 @@ class Quiz extends Model
             : 10;
     }
 }
-

@@ -13,6 +13,46 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
+            <div class="card card-body">
+                <h4 class="card-title">Filter</h4>
+                <form action="{{ route('admin.quizzes.questions.index', $quiz) }}" method="GET" id="filterForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="question">Keyword</label>
+                                <input type="text" name="keyword" id="keyword" class="form-control"
+                                    value="{{ app('request')->query('keyword') }}" placeholder="Enter question">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="status">Type</label>
+                                <select name="status" id="status" class="form-control select2">
+                                    <option value="">All</option>
+                                    @forelse(config('quiz.constants.questionType') as $key => $type)
+                                    <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>
+                                        {{ $type }}
+                                    </option>
+                                    @empty
+                                    <option value="">No type found</option>
+                                    @endforelse
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto mt-1 text-right">
+                            <div class="form-group">
+                                <label for="created_at">&nbsp;</label>
+                                <button type="submit" form="filterForm" class="btn btn-primary mt-4">Filter</button>
+                                <a href="{{ route('admin.quizzes.questions.index', $quiz) }}" class="btn btn-secondary mt-4">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     @admincan('quizzes_manager_edit')
@@ -25,10 +65,10 @@
                         <table class="table">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Question</th>
-                                    <th>Type</th>
-                                    <th>Points</th>
+                                    <th>S. No.</th>
+                                    <th>@sortablelink('question_text', 'Question', [], ['class' => 'text-dark'])</th>
+                                    <th>@sortablelink('question_text', 'Type', [], ['class' => 'text-dark'])</th>
+                                    <th>@sortablelink('points', 'Points', [], ['class' => 'text-dark'])</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

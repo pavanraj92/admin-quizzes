@@ -8,6 +8,8 @@ use admin\quizzes\Requests\QuizCreateRequest;
 use admin\quizzes\Requests\QuizUpdateRequest;
 use admin\quizzes\Models\Quiz;
 use admin\courses\Models\Course;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class QuizManagerController extends Controller
 {
@@ -92,6 +94,18 @@ class QuizManagerController extends Controller
     public function destroy(Quiz $quiz)
     {
         try {
+            if (Schema::hasTable('quiz_questions')) {
+                $isAssigned =  DB::table('quiz_questions')
+                    ->where('quiz_id', $quiz->id)
+                    ->count();
+
+                if ($isAssigned > 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Sorry, you cannot delete because this quiz is associated with one or more questions.'
+                    ], 400);
+                }
+            }
             $quiz->delete();
             return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
         } catch (\Exception $e) {
@@ -128,4 +142,3 @@ class QuizManagerController extends Controller
         }
     }
 }
-

@@ -7,19 +7,32 @@ use Illuminate\Http\Request;
 use admin\quizzes\Models\Quiz;
 use admin\quizzes\Models\QuizQuestion;
 use admin\quizzes\Requests\QuizQuestionRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class QuizQuestionController extends Controller
 {
     public function __construct()
     {
         $this->middleware('admincan_permission:quizzes_manager_view')->only(['index', 'show']);
-        $this->middleware('admincan_permission:quizzes_manager_edit')->only(['create','store','edit','update','destroy']);
+        $this->middleware('admincan_permission:quizzes_manager_edit')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    public function index(Quiz $quiz)
+    public function index(Request $request, Quiz $quiz)
     {
-        $questions = $quiz->questions()->latest()->paginate(20)->withQueryString();
-        return view('quiz::admin.question.index', compact('quiz', 'questions'));
+        try {
+            $questions = $quiz->questions()
+                ->filter($request->query('keyword'))
+                ->filterByStatus($request->query('status'))
+                ->sortable()
+                ->latest()
+                ->paginate(QuizQuestion::getPerPageLimit())
+                ->withQueryString();
+
+            return view('quiz::admin.question.index', compact('quiz', 'questions'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to load questions: ' . $e->getMessage());
+        }
     }
 
     public function create(Quiz $quiz)
@@ -51,8 +64,19 @@ class QuizQuestionController extends Controller
 
     public function destroy(Quiz $quiz, QuizQuestion $question)
     {
+        if (Schema::hasTable('quiz_answers')) {
+            $isAssigned =  DB::table('quiz_answers')
+                ->where('question_id', $question->id)
+                ->count();
+
+            if ($isAssigned > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sorry, you cannot delete because this question is associated with one or more answers.'
+                ], 400);
+            }
+        }
         $question->delete();
         return response()->json(['success' => true, 'message' => 'Record deleted successfully.']);
     }
 }
-
