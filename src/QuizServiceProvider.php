@@ -19,7 +19,13 @@ class QuizServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/views'      // Package views as fallback
         ], 'quiz');
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/quiz.php', 'quiz.constants');
+        // Load published module config first (if it exists), then fallback to package config
+        if (file_exists(base_path('Modules/Quizzes/config/quiz.php'))) {
+            $this->mergeConfigFrom(base_path('Modules/Quizzes/config/quiz.php'), 'quiz.constants');
+        } else {
+            // Fallback to package config if published config doesn't exist
+            $this->mergeConfigFrom(__DIR__ . '/../config/quiz.php', 'quiz.constants');
+        }
 
         // Also register module views with a specific namespace for explicit usage
         if (is_dir(base_path('Modules/Quizzes/resources/views'))) {
@@ -29,11 +35,6 @@ class QuizServiceProvider extends ServiceProvider
         // Also load migrations from published module if they exist
         if (is_dir(base_path('Modules/Quizzes/database/migrations'))) {
             $this->loadMigrationsFrom(base_path('Modules/Quizzes/database/migrations'));
-        }
-
-        // Also merge config from published module if it exists
-        if (file_exists(base_path('Modules/Quizzes/config/quizzes.php'))) {
-            $this->mergeConfigFrom(base_path('Modules/Quizzes/config/quizzes.php'), 'quiz.constants');
         }
 
         // Only publish automatically during package installation, not on every request
