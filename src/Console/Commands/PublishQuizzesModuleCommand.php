@@ -141,6 +141,12 @@ class PublishQuizzesModuleCommand extends Command
                 'use Modules\\Quizzes\\app\\Http\\Requests\\QuizUpdateRequest;',
                 $content
             );
+        } elseif (str_contains($sourceFile, 'Models')) {
+            $content = str_replace(
+                'use admin\\courses\\Models\\Course;',
+                'use Modules\\Courses\\app\\Models\\Course;',
+                $content
+            );
         }
 
         return $content;
@@ -160,4 +166,3 @@ class PublishQuizzesModuleCommand extends Command
         }
     }
 }
-
