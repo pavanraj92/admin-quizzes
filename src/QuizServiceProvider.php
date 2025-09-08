@@ -197,6 +197,12 @@ class QuizServiceProvider extends ServiceProvider
         );
 
         $content = str_replace(
+            'use admin\\courses\\Models\\Course;',
+            'use Modules\\Courses\\app\\Models\\Course;',
+            $content
+        );
+
+        $content = str_replace(
             'use admin\\quizzes\\Requests\\QuizAnswerRequest;',
             'use Modules\\Quizzes\\app\\Http\\Requests\\QuizAnswerRequest;',
             $content
@@ -227,6 +233,11 @@ class QuizServiceProvider extends ServiceProvider
     protected function transformModelNamespaces($content)
     {
         // Any model-specific transformations
+        $content = str_replace(
+            'use admin\\courses\\Models\\Course;',
+            'use Modules\\Courses\\app\\Models\\Course;',
+            $content
+        );
         return $content;
     }
 
